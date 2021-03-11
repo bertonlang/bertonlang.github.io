@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-
-<html lang="en">
-
+<html>
 <head>
-  
-  <title>Linux运维5:LVM逻辑卷管理 - Hexo</title>
-  <meta charset="UTF-8">
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta charset="utf-8">
   
   
-
-  <link rel="shortcut icon" href="/favicon.ico" type="image/png" />
+  <title>Linux运维5:LVM逻辑卷管理 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="LVM动态卷管理：可以将多个硬盘和硬盘分区做成一个逻辑卷，并把这个逻辑卷作为一个整体来同意管理，动态对分区进行扩缩空间大小，安全快捷方便管理。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux运维5:LVM逻辑卷管理">
@@ -31,137 +25,85 @@
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://s1.ax1x.com/2020/03/25/8XaXnO.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/highlight.js@9.15.8/styles/atom-one-dark.css,gh/theme-nexmoe/hexo-theme-nexmoe@latest/source/lib/mdui_043tiny/css/mdui.css,gh/theme-nexmoe/hexo-theme-nexmoe@latest/source/lib/iconfont/iconfont.css,gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css?v=233" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css">
   
-  <link rel="stylesheet" href="/project/css/style.css?v=1615483393200">
+    <link rel="alternate" href="/project/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/project/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/project/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/project/fancybox/jquery.fancybox.min.css">
+
+  
 <meta name="generator" content="Hexo 5.4.0"></head>
 
-<body class="mdui-drawer-body-left">
-  
-  <div id="nexmoe-background">
-    <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/cover/5c3aec85a4343.jpg)"></div>
-    <div class="mdui-appbar mdui-shadow-0">
-      <div class="mdui-toolbar">
-        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
-        <div class="mdui-toolbar-spacer"></div>
-        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
-        <a href="/project/" title="John Doe" class="mdui-btn mdui-btn-icon"><img src="https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/avatar.png" alt="John Doe"></a>
-       </div>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/project/" id="logo">Hexo</a>
+      </h1>
+      
     </div>
-  </div>
-  <div id="nexmoe-header">
-      <div class="nexmoe-drawer mdui-drawer" id="drawer">
-    <div class="nexmoe-avatar mdui-ripple">
-        <a href="/project/" title="John Doe">
-            <img src="https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/avatar.png" alt="John Doe" alt="John Doe">
-        </a>
-    </div>
-    <div class="nexmoe-count">
-        <div><span>Articles</span>6</div>
-        <div><span>Tags</span>2</div>
-        <div><span>Categories</span>0</div>
-    </div>
-    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/project/" title="回到首页">
-            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
-            <div class="mdui-list-item-content">
-                回到首页
-            </div>
-        </a>
+          <a class="main-nav-link" href="/project/">Home</a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/project/about.html" title="关于博客">
-            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
-            <div class="mdui-list-item-content">
-                关于博客
-            </div>
-        </a>
+          <a class="main-nav-link" href="/project/archives">Archives</a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/project/PY.html" title="我的朋友">
-            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
-            <div class="mdui-list-item-content">
-                我的朋友
-            </div>
-        </a>
+      </nav>
+      <nav id="sub-nav">
         
-    </div>
-    <aside id="nexmoe-sidebar">
-  
-  <div class="nexmoe-widget-wrap">
-    <div class="nexmoe-widget nexmoe-search">
-        <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
-            <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
-        </form>
-    </div>
-</div>
-  
-  <div class="nexmoe-widget-wrap">
-    <div class="nexmoe-widget nexmoe-social">
-        <a class="mdui-ripple" href="https://jq.qq.com/?_wv=1027&k=5CfKHun" target="_blank" mdui-tooltip="{content: 'QQ群'}" style="color: rgb(249, 174, 8);background-color: rgba(249, 174, 8, .1);">
-            <i class="nexmoefont icon-QQ"></i>
-        </a><a class="mdui-ripple" href="https://space.bilibili.com/20238211" target="_blank" mdui-tooltip="{content: '哔哩哔哩'}" style="color: rgb(231, 106, 141);background-color: rgba(231, 106, 141, .15);">
-            <i class="nexmoefont icon-bilibili"></i>
-        </a><a class="mdui-ripple" href="https://github.com/nexmoe/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
-            <i class="nexmoefont icon-github"></i>
-        </a>
-    </div>
-</div>
-  
-  
-
-  
-  
-  <div class="nexmoe-widget-wrap">
-    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
-      <a href="/project/tags/linux/" style="font-size: 20px;">linux</a> <a href="/project/tags/python/" style="font-size: 10px;">python</a>
-    </div>
-    
-  </div>
-
-  
-</aside>
-    <div class="nexmoe-copyright">
-        &copy; 2021 John Doe
-        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+          <a id="nav-rss-link" class="nav-icon" href="/project/atom.xml" title="RSS Feed"></a>
         
-    </div>
-</div><!-- .nexmoe-drawer -->
-  </div>
-  <div id="nexmoe-content">
-    <div class="nexmoe-primary">
-        <div class="nexmoe-post">
-  
-      <div class="nexmoe-post-cover" style="padding-bottom: 66.66666666666666%;"> 
-          <img data-src="https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/cover/5c3aec85a4343.jpg" data-sizes="auto" alt="Linux运维5:LVM逻辑卷管理" class="lazyload">
-          <h1>Linux运维5:LVM逻辑卷管理</h1>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://bertonlang.github.io/project"></form>
       </div>
-  
-  
-  <div class="nexmoe-post-meta nexmoe-rainbow" style="margin:10px 0!important;">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2020年03月13日</a>
-    <a><i class="nexmoefont icon-areachart"></i>680 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 3 分钟</a>
-</div>
+    </div>
+  </div>
+</header>
 
-  <div class="nexmoe-post-right">
-    
-      <div class="nexmoe-fixed">
-        <div class="nexmoe-valign">
-            <div class="nexmoe-toc">
-                
-                
-                  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">常用命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BALVM%E9%80%BB%E8%BE%91%E5%8D%B7"><span class="toc-number"></span> <span class="toc-text">创建LVM逻辑卷</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9C%89%E5%A4%9A%E4%B8%AA%E5%88%86%E5%8C%BA%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">为什么要有多个分区？</span></a></li></ol>
-                
-            </div>
-        </div>
-      </div>
+      <div class="outer">
+        <section id="main"><article id="post-Linux运维5" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/project/2020/03/13/Linux%E8%BF%90%E7%BB%B45/" class="article-date">
+  <time class="dt-published" datetime="2020-03-13T02:18:00.000Z" itemprop="datePublished">2020-03-13</time>
+</a>
     
   </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Linux运维5:LVM逻辑卷管理
+    </h1>
+  
 
-  <article>
-    <p><strong>LVM动态卷管理：可以将多个硬盘和硬盘分区做成一个逻辑卷，并把这个逻辑卷作为一个整体来同意管理，动态对分区进行扩缩空间大小，安全快捷方便管理。</strong></p>
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><strong>LVM动态卷管理：可以将多个硬盘和硬盘分区做成一个逻辑卷，并把这个逻辑卷作为一个整体来同意管理，动态对分区进行扩缩空间大小，安全快捷方便管理。</strong></p>
 <span id="more"></span>
 
 <h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><ul>
@@ -189,21 +131,21 @@
 <h2 id="创建LVM逻辑卷"><a href="#创建LVM逻辑卷" class="headerlink" title="创建LVM逻辑卷"></a>创建LVM逻辑卷</h2><ol>
 <li><p>检查现有磁盘</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk -l    # 查看磁盘信息</span><br></pre></td></tr></table></figure>
-<p><img data-fancybox="gallery" data-sizes="auto" data-src="https://s1.ax1x.com/2020/03/25/8XaXnO.png" alt="磁盘信息1" class="lazyload"><br>一般第一块磁盘命名为sda，第二块为sdb，以此类推，磁盘路径在开头，如sda磁盘路径为<code>/dev/sda</code>。如图sda已经进行了分区，分为2个分区sda1和sda2；sdb未进行分区。</p>
+<p><img src="https://s1.ax1x.com/2020/03/25/8XaXnO.png" alt="磁盘信息1"><br>一般第一块磁盘命名为sda，第二块为sdb，以此类推，磁盘路径在开头，如sda磁盘路径为<code>/dev/sda</code>。如图sda已经进行了分区，分为2个分区sda1和sda2；sdb未进行分区。</p>
 </li>
 <li><p>将磁盘进行简单分区</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk &#x2F;dev&#x2F;sdb # 开始分区</span><br></pre></td></tr></table></figure></li>
 </ol>
 <p>输入n开始分区，然后一路默认；最后输入m保存分区并退出，然后再次查看磁盘信息。</p>
-<p><img data-fancybox="gallery" data-sizes="auto" data-src="https://s1.ax1x.com/2020/03/25/8XOfKI.png" alt="磁盘信息2" class="lazyload"><br>现在可以看到sdb有了一个分区，分区后磁盘路径就变味了下面显示的路径，如<code>/dev/sdb1</code>。</p>
+<p><img src="https://s1.ax1x.com/2020/03/25/8XOfKI.png" alt="磁盘信息2"><br>现在可以看到sdb有了一个分区，分区后磁盘路径就变味了下面显示的路径，如<code>/dev/sdb1</code>。</p>
 <ol start="3">
 <li><p>将磁盘转换成pv对象</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pvcreate &#x2F;dev&#x2F;sdb1  # 若成功下面会提示成功</span><br><span class="line"></span><br><span class="line">pvdisplay   # 查看pv对象信息</span><br></pre></td></tr></table></figure>
-<p><img data-fancybox="gallery" data-sizes="auto" data-src="https://s1.ax1x.com/2020/03/25/8XxRFf.png" alt="查看pv对象" class="lazyload"><br>如图所示，可以查看到pv对象中有了sdb1的信息。</p>
+<p><img src="https://s1.ax1x.com/2020/03/25/8XxRFf.png" alt="查看pv对象"><br>如图所示，可以查看到pv对象中有了sdb1的信息。</p>
 </li>
 <li><p>创建vg资源池</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vgcreate pool1 &#x2F;dev&#x2F;sdb1    # 成功会有提示</span><br><span class="line"></span><br><span class="line">vgdisplay   # 查看vg信息</span><br></pre></td></tr></table></figure>
-<p><img data-fancybox="gallery" data-sizes="auto" data-src="https://s1.ax1x.com/2020/03/25/8XzZ1e.png" alt="查看vg信息" class="lazyload"><br>如图所示，可以查看到新建的vg资源池，名字是pool1。这里要注意几个参数：</p>
+<p><img src="https://s1.ax1x.com/2020/03/25/8XzZ1e.png" alt="查看vg信息"><br>如图所示，可以查看到新建的vg资源池，名字是pool1。这里要注意几个参数：</p>
 </li>
 </ol>
 <ul>
@@ -216,11 +158,11 @@
 <ol start="5">
 <li><p>从vg资源池中创建lv分区</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lvcreate -n lvroom1 -L 5G pool1 # 成功会有提示</span><br><span class="line"></span><br><span class="line">lvdisplay   # 查看lv信息</span><br></pre></td></tr></table></figure>
-<p><img data-fancybox="gallery" data-sizes="auto" data-src="https://s1.ax1x.com/2020/03/25/8jSu2F.png" alt="查看lv信息" class="lazyload"><br>如图可以查看到新建的lvroom1的信息</p>
+<p><img src="https://s1.ax1x.com/2020/03/25/8jSu2F.png" alt="查看lv信息"><br>如图可以查看到新建的lvroom1的信息</p>
 </li>
 <li><p>格式化lv分区</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkfs.ext3 &#x2F;dev&#x2F;pool1&#x2F;lvroom1    # 最后要格式化新建的lv分区</span><br><span class="line"></span><br><span class="line">blkid   # 查看分区信息</span><br></pre></td></tr></table></figure>
-<p><img data-fancybox="gallery" data-sizes="auto" data-src="https://s1.ax1x.com/2020/03/25/8jSU2D.png" alt="分区信息" class="lazyload"><br>如图所示最后一行的lvroom1分区的格式为ext3。</p>
+<p><img src="https://s1.ax1x.com/2020/03/25/8jSU2D.png" alt="分区信息"><br>如图所示最后一行的lvroom1分区的格式为ext3。</p>
 </li>
 </ol>
 <h3 id="为什么要有多个分区？"><a href="#为什么要有多个分区？" class="headerlink" title="为什么要有多个分区？"></a>为什么要有多个分区？</h3><ul>
@@ -229,74 +171,150 @@
 <li>数据激增到极限不会引起系统挂起：将用户数据和系统数据分开，可以避免用户数据填满整个硬盘，引起系统挂起</li>
 </ul>
 
-  </article>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://bertonlang.github.io/project/2020/03/13/Linux%E8%BF%90%E7%BB%B45/" data-id="ckm5564cy0005g8u3as9ebu4c" data-title="Linux运维5:LVM逻辑卷管理" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/project/tags/linux/" rel="tag">linux</a></li></ul>
 
-  
-    
-
-  
-  
-  <div class="nexmoe-post-meta nexmoe-rainbow">
-    
-    
-        <a class="nexmoefont icon-tag-fill -none-link" href="/project/tags/linux/" rel="tag">linux</a>
-    
-</div>
-
-  <div class="nexmoe-post-footer">
-    <section class="nexmoe-comment">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
-<div id="gitalk"></div>
-<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
-<script type="text/javascript">
-    var gitalk = new Gitalk({
-        clientID: '80b2453b6d5f37ad6225',
-        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
-        id: window.location.pathname,
-        repo: 'nexmoe.github.io',
-        owner: 'nexmoe',
-        admin: 'nexmoe'
-    })
-    gitalk.render('gitalk')
-</script>
-</section>
+    </footer>
   </div>
-</div>
-        <div class="nexmoe-post-right">
-          <div class="nexmoe-fixed">
-            <div class="nexmoe-tool">
-              <a href="#nexmoe-content" class="toc-link" aria-label="回到顶部" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
-            </div>
-          </div>
-        </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/project/2020/03/14/python%E6%AD%A3%E5%88%99%E5%B0%8F%E4%BE%8B%E5%AD%90/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          利用python正则添加txt小说目录
+        
+      </div>
+    </a>
+  
+  
+    <a href="/project/2020/03/12/Linux%E8%BF%90%E7%BB%B44/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linux运维4:磁盘挂载,包管理工具</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/project/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/project/tags/python/" rel="tag">python</a></li></ul>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/combine/npm/lazysizes@5.1.0/lazysizes.min.js,gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js,npm/mdui@0.4.3/dist/js/mdui.min.js?v=1"></script>
-<script>
-	hljs.initHighlightingOnLoad();
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
-
-
-<script src="https://cdn.jsdelivr.net/gh/xtaodada/xtaodada.github.io@0.0.2/copy.js"></script>
- <script src="/project/js/app.js?v=1615483393201"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js"></script>
-<script>
-	$(".justified-gallery").justifiedGallery({
-		rowHeight: 160,
-		margins: 10,
-	});
-</script>
 
   
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/project/tags/linux/" style="font-size: 20px;">linux</a> <a href="/project/tags/python/" style="font-size: 10px;">python</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/project/archives/2021/03/">March 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/project/archives/2020/03/">March 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/project/2021/03/11/Linux%E8%BF%90%E7%BB%B42/">Linux运维2:用户和组设置,文件目录权限,环境变量</a>
+          </li>
+        
+          <li>
+            <a href="/project/2020/03/14/python%E6%AD%A3%E5%88%99%E5%B0%8F%E4%BE%8B%E5%AD%90/">利用python正则添加txt小说目录</a>
+          </li>
+        
+          <li>
+            <a href="/project/2020/03/13/Linux%E8%BF%90%E7%BB%B45/">Linux运维5:LVM逻辑卷管理</a>
+          </li>
+        
+          <li>
+            <a href="/project/2020/03/12/Linux%E8%BF%90%E7%BB%B44/">Linux运维4:磁盘挂载,包管理工具</a>
+          </li>
+        
+          <li>
+            <a href="/project/2020/03/11/Linux%E8%BF%90%E7%BB%B43/">Linux运维3:通配符和vim的使用</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2021 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/project/" class="mobile-nav-link">Home</a>
+  
+    <a href="/project/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/project/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/project/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/project/js/script.js"></script>
 
 
 
 
 
+  </div>
 </body>
-
 </html>
